@@ -119,7 +119,7 @@ def WaitForAPIChat(message):
             print("----Memory Full Forgetting")
             extra_text = " ***Memory is Full Forgetting***"
             message_history_chat = []
-        message_history_chat = message +  " " + response.last;
+        message_history_chat.append(" " + response.last)
     else:
         #Return Message history to default
         message_history_chat = []
@@ -128,7 +128,7 @@ def WaitForAPIChat(message):
 #Example just using text completion mode
 def WaitForAPIGenerate(message):
     
-    global message_history
+    global message_history_gen
     global history_count
     extra_text = ""
     #if Memory All this stuff
