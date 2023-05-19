@@ -3,9 +3,9 @@
 A simple Discord bot example that uses PaLM2 Api.
 
 
-## Step 1: Edit ```botConfig.py```
+## Step 1: Edit 
 
-Add your Discord Key and your PaLM2 API Key 
+Open ```botConfig.py``` and replace the default text with your Discord Key and your PaLM2 API Key 
 
 > Getting your Discord Key -https://discordpy.readthedocs.io/en/stable/discord.html
 
