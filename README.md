@@ -23,7 +23,7 @@ Open ```botConfig.py``` and replace the default text with your Discord Key and y
 
 ## Bot Usage
 
-It will respond a persons DM's and you mention in any channel it has access to. 
+The bot will respond a persons DM's and mention in any channel it has access to. 
 
 ## Memory:
 
