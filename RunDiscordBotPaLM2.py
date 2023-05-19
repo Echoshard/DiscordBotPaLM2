@@ -5,9 +5,9 @@ from discord.ext import commands
 
 
 #imports from BotConfig
-from botConfig import DISCORD_API_KEY
+from botConfig import DISCORD_BOT_TOKEN
 from botConfig import BOTDESCRIPTION
-from botConfig import MESSAGE_MAX_HISTORY;
+from botConfig import MESSAGE_MAX_HISTORY
 from botConfig import PALM2_API_KEY
 from botConfig import HAS_MEMORY
 
@@ -157,4 +157,4 @@ async def ExtraCommands(message):
     return
 
 #Run the Bot!
-bot.run(DISCORD_API_KEY)
+bot.run(DISCORD_BOT_TOKEN)
