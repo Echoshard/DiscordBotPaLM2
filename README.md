@@ -6,12 +6,12 @@ Step 1: Edit ```botConfig.py```
 
 Add your Discord Key and your PaLM2 API Key 
 
-Getting your Discord Key
+Getting your Discord Key -
 https://discordpy.readthedocs.io/en/stable/discord.html
 
 ```DISCORD_API_KEY = "DISCORD KEY"```
 
-Getting your PaLM2 Key
+Getting your PaLM2 Key - 
 https://makersuite.google.com/waitlist
 
 ```PALM2_API_KEY = "PALM API KEY"```
