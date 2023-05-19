@@ -1,4 +1,4 @@
-﻿#DiscordPlam2ChatBot
+#DiscordPlam2ChatBot
 
 import discord
 from discord.ext import commands
@@ -10,12 +10,17 @@ from botConfig import BOTDESCRIPTION
 from botConfig import MESSAGE_MAX_HISTORY
 from botConfig import PALM2_API_KEY
 from botConfig import HAS_MEMORY
+from botConfig import BOT_CONTEXT
+from botConfig import EXAMPLE_MESSAGES;
+from botConfig import USE_CHAT;
+from botConfig import EXAMPLE_MESSAGES;
+from botConfig import DEFAULT_GENERATE_TEXT;
+from botConfig import DEFAULT_CHAT;
 
 #Memory System  
-message_history = ""
+message_history = [
+]
 history_count = 0   
-
-
 
 #Discord Intents
 intents = discord.Intents.default()
@@ -27,15 +32,6 @@ intents.message_content = True
 import google.generativeai as palm
 palm.configure(api_key=PALM2_API_KEY)
 
-defaults = {
-  'model': 'models/text-bison-001',
-  'temperature': 0.6,
-  'candidate_count': 1,
-  'top_k': 40,
-  'top_p': 0.95,
-  'max_output_tokens': 1024,
-  'stop_sequences': []
-}
 
 #Start the Bot!
 bot = commands.Bot(command_prefix='!', description=BOTDESCRIPTION, intents=intents)
@@ -84,20 +80,57 @@ async def on_message(message):
                 await message.author.send("Failed To Answer")
                 await message.add_reaction('❌')
 
-
 def WaitForAPI(message):
+    if USE_CHAT:
+        return WaitForAPIChat(message)
+    else:
+        return WaitForAPIGenerate(message)
+
+
+#Example using Chat mode Trainable
+def WaitForAPIChat(message):
+    global message_history
+    global history_count
+    extra_text = ""
+    message_history.append(message)
+
+    #Talk to API
+    response = palm.chat(
+    **DEFAULT_CHAT,
+    context=BOT_CONTEXT,
+    examples=EXAMPLE_MESSAGES,
+    messages=message_history
+    )
+    #Check For Errors
+    if not response.last:
+            print(message + "Failed to Send")
+            return None
+    #Deal with Memory
+    if HAS_MEMORY:
+        history_count = history_count + 1
+        if history_count > MESSAGE_MAX_HISTORY:
+            print("----Memory Full Forgetting")
+            extra_text = " ***Memory is Full Forgetting***"
+            message_history = ""
+        message_history = message +  " " + response.last;
+    else:
+        #Return Message history to default
+        message_history = []
+    return response.last + extra_text
+
+#Example just using text completion mode
+def WaitForAPIGenerate(message):
     
     global message_history
     global history_count
     extra_text = ""
-
     #if Memory All this stuff
     if HAS_MEMORY:
         message_history  += " " + message
 
-        #Talk to open AI
+        #Talk to palm AI simple Text generate
         response = palm.generate_text(
-        **defaults,
+        **DEFAULT_GENERATE_TEXT,
         prompt=message_history
         )
         if not response.result:
@@ -113,7 +146,7 @@ def WaitForAPI(message):
     #Skip Memory and just reply
     else:
         response = palm.generate_text(
-        **defaults,
+        **DEFAULT_GENERATE_TEXT,
         prompt=message
         )
         if not response.result:
@@ -148,7 +181,8 @@ async def ExtraCommands(message):
                 message_history = "";
                 history_count = 0
                 return "***Deleteing History Reset to Default***"
-            #case 2:
+            #Add extra  cases for later!
+            #case 2: 
             #    print("Two")
             #case 3:
             #    print("Three")
