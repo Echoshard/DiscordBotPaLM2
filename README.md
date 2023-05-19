@@ -5,11 +5,11 @@ A simple Discord bot example that uses PaLM2 Api.
 
 ## Step 1: Edit 
 
-Open ```botConfig.py``` and replace the default text with your Discord Key and your PaLM2 API Key 
+Open ```botConfig.py``` and replace the default text with your Discord Bot Token and your PaLM2 API Key 
 
-> Getting your Discord Key -https://discordpy.readthedocs.io/en/stable/discord.html
+> Getting your Discord Bot Token -https://discordpy.readthedocs.io/en/stable/discord.html
 
-```DISCORD_API_KEY = "DISCORD KEY"```
+```DISCORD_BOT_TOKEN = "DISCORD TOKEN""```
 
 > Getting your PaLM2 Key - https://makersuite.google.com/waitlist
 
