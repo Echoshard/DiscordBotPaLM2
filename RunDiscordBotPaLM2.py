@@ -18,9 +18,16 @@ from botConfig import DEFAULT_GENERATE_TEXT;
 from botConfig import DEFAULT_CHAT;
 
 #Memory System  
-message_history = [
-]
+
+#Chat uses a list of messages
+#Generate uses a string
+
+message_history_chat = []
+message_history_gen = ""
+
 history_count = 0   
+
+
 
 #Discord Intents
 intents = discord.Intents.default()
@@ -89,17 +96,17 @@ def WaitForAPI(message):
 
 #Example using Chat mode Trainable
 def WaitForAPIChat(message):
-    global message_history
+    global message_history_chat
     global history_count
     extra_text = ""
-    message_history.append(message)
+    message_history_chat.append(message)
 
     #Talk to API
     response = palm.chat(
     **DEFAULT_CHAT,
     context=BOT_CONTEXT,
     examples=EXAMPLE_MESSAGES,
-    messages=message_history
+    messages=message_history_chat
     )
     #Check For Errors
     if not response.last:
@@ -111,11 +118,11 @@ def WaitForAPIChat(message):
         if history_count > MESSAGE_MAX_HISTORY:
             print("----Memory Full Forgetting")
             extra_text = " ***Memory is Full Forgetting***"
-            message_history = ""
-        message_history = message +  " " + response.last;
+            message_history_chat = []
+        message_history_chat = message +  " " + response.last;
     else:
         #Return Message history to default
-        message_history = []
+        message_history_chat = []
     return response.last + extra_text
 
 #Example just using text completion mode
@@ -125,33 +132,25 @@ def WaitForAPIGenerate(message):
     global history_count
     extra_text = ""
     #if Memory All this stuff
-    if HAS_MEMORY:
-        message_history  += " " + message
+    message_history_gen += message;
 
         #Talk to palm AI simple Text generate
-        response = palm.generate_text(
-        **DEFAULT_GENERATE_TEXT,
-        prompt=message_history
-        )
-        if not response.result:
-                print(message + "Failed to Send")
-                return None
-
+    response = palm.generate_text(
+    **DEFAULT_GENERATE_TEXT,
+    prompt=message_history_gen
+    )
+    if not response.result:
+            print(message + "Failed to Send")
+            return None
+    if HAS_MEMORY:
         history_count = history_count + 1
         if history_count > MESSAGE_MAX_HISTORY:
             print("----Memory Full Forgetting")
             extra_text = " ***Memory is Full Forgetting***"
-            message_history = ""
-        message_history = message +  " " + response.result;
-    #Skip Memory and just reply
+            message_history_gen = ""
+        message_history_gen = message +  " " + response.result;
     else:
-        response = palm.generate_text(
-        **DEFAULT_GENERATE_TEXT,
-        prompt=message
-        )
-        if not response.result:
-            print(message + "Failed to Send")
-            return None
+        message_history_gen = ""
     return response.result + extra_text
 
 
