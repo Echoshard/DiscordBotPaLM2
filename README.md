@@ -1,11 +1,5 @@
 # DiscordBotPaLM2
-A simple Discord bot that uses PaLM2 Api
-
-This is a simple discord bot using PaLM2 API
-
-It will respond to DM's and you can @It in any channel it has access to. 
-
-It has a set memory that can be reset with COM Reset.
+A simple Discord bot example that uses PaLM2 Api.
 
 
 Step 1: Edit ```botConfig.py```
@@ -22,10 +16,17 @@ https://makersuite.google.com/waitlist
 
 ```PALM2_API_KEY = "PALM API KEY"```
 
-
 Step 2:
 
 ```pip install -r requirements.txt```
 
 Step 3 Run 
-python RunDiscordBotPaLM2.py
+```python RunDiscordBotPaLM2.py```
+
+Bot Usage
+
+It will respond a persons DM's and you mention in any channel it has access to. 
+
+Memory:
+
+This Bot has a simple memory system it is off by default and can be enabled by ```HAS_MEMORY``` = True It keeps track of the ```MESSAGE_MAX_HISTORY``` and can be reset by typing ```COM Reset``` It is best to disable this if you are going to use it with many people as the memory
