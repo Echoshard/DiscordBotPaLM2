@@ -24,7 +24,14 @@ Open ```botConfig.py``` and replace the default text with your Discord Bot Token
 
   ## Memory:
 
-  This Bot has a simple memory system it is off by default and can be enabled by ```HAS_MEMORY``` = True It keeps track of the ```MESSAGE_MAX_HISTORY``` and can be reset by typing ```COM Reset``` It is best to disable this if you are going to use it with many people as the memory
+  ---
+  **UPDATED**
+  
+  Memory now is done per user! so you can use it on a discord server easily to carry on a conversation.
+  
+  ---
+  This Bot has a simple memory system it is off by default and can be enabled by ```HAS_MEMORY``` = True It keeps track of the ```MESSAGE_MAX_HISTORY``` and can be reset by typing ```COM Reset``` It is best to disable this if you are going to use it with many people as the memor
+  
 
   # Chat and Refinement
   The bot is defaulted to text generation, this gives much faster generation and sets everything to default. changing the bot to chat mode will allow you to give it a personality and alter it. You can enable the chat mode by changing ```USE_CHAT``` to true. <p>
