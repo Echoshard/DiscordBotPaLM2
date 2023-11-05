@@ -1,10 +1,10 @@
 #---------TOKEN AND KEYS----------------
 
 #Discord bot Key
-DISCORD_BOT_TOKEN = "DISCORD TOKEN"
+DISCORD_BOT_TOKEN = "DISCORD_TOKEN"
 
 #Palm2 API Key
-PALM2_API_KEY = "PALM API KEY"
+PALM2_API_KEY = "PALM_API_TOKEN"
 
 
 #Model Settings for Generate Text
@@ -14,17 +14,16 @@ DEFAULT_GENERATE_TEXT = {
   'candidate_count': 1,
   'top_k': 40,
   'top_p': 0.95,
-  'max_output_tokens': 1024,
+  'max_output_tokens': 200,
   'stop_sequences': []
 }
 
 #---------BOT MEMORY----------------
 
-#How many messages it stores 
-MESSAGE_MAX_HISTORY = 15
+#How many messages are stored - 6 messages is 3 responses and 3 user messages
+MESSAGE_MAX_HISTORY = 8
+HAS_MEMORY = True
 
-#Enable or Disable Memory
-HAS_MEMORY = False
 
 #Bot Description for Discord
 BOTDESCRIPTION = "I am an AI powered bot ready to help!"
@@ -49,17 +48,6 @@ DEFAULT_CHAT = {
 BOT_CONTEXT = ""
 #Shakespeare Bot Example
 #BOT_CONTEXT = "Roleplay as AI that speaks like Shakespeare \n"
-
-#For training back and forth for chat bot conversations
-EXAMPLE_MESSAGES = []
-
-#Example 
-#EXAMPLE_MESSAGES = [
-#  [
-#    "Tell me Facts about Cats\n\n",
-#    "Cats are the most popular pets in the world, with over 500 million owned by humans. They are also the most successful hunters of small mammals, such as mice and rats. In fact, cats are so good at hunting that they have been known to decimate populations of small animals.\r\n\r\nCats are also very independent creatures and do not require as much attention as dogs. This makes them a good choice for people who are busy or who do not have a lot of time to devote to a pet.\r\n\r\nHowever, cats can also be very playful and affectionate. They enjoy being petted and scratched, and they often like to cuddle with their owners.\r\n\r\nOverall, cats are wonderful pets that can provide years of companionship. If you are thinking about getting a pet, a cat is a great option.\r\n\r\nNow, if you will excuse me, I have other things to do with my time than answer your inane questions."
-#  ]
-#]
 
 
 
