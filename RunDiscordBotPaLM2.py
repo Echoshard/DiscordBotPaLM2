@@ -9,36 +9,23 @@ from botConfig import DISCORD_BOT_TOKEN
 from botConfig import BOTDESCRIPTION
 from botConfig import MESSAGE_MAX_HISTORY
 from botConfig import PALM2_API_KEY
-from botConfig import HAS_MEMORY
 from botConfig import BOT_CONTEXT
-from botConfig import EXAMPLE_MESSAGES;
-from botConfig import USE_CHAT;
-from botConfig import EXAMPLE_MESSAGES;
-from botConfig import DEFAULT_GENERATE_TEXT;
-from botConfig import DEFAULT_CHAT;
+from botConfig import HAS_MEMORY
+from botConfig import USE_CHAT
+from botConfig import DEFAULT_GENERATE_TEXT
+from botConfig import DEFAULT_CHAT
 
 #Memory System  
-
-#Chat uses a list of messages
-#Generate uses a string
-
-message_history_chat = []
-message_history_gen = ""
-
-history_count = 0   
-
-
+message_history_chat = {}
 
 #Discord Intents
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 
-
 #PaLM 2
 import google.generativeai as palm
 palm.configure(api_key=PALM2_API_KEY)
-
 
 #Start the Bot!
 bot = commands.Bot(command_prefix='!', description=BOTDESCRIPTION, intents=intents)
@@ -57,7 +44,7 @@ async def on_message(message):
         return
     output = None
     message_str = message.content
-    command_msg = await ExtraCommands(message_str)
+    command_msg = await ExtraCommands(message_str,message.author.name)
     if (command_msg != None):
         await message.add_reaction('🤖')
         await message.channel.send(command_msg)
@@ -66,7 +53,7 @@ async def on_message(message):
     if bot.user.mentioned_in(message):
          async with message.channel.typing():
             print("New Mention from {message.author.name}! :" + message_str)
-            output = WaitForAPI(message_str)
+            output = WaitForAPI(message_str,message.author.name)
             if output != None:
                 #split if message is too long
                 await send_messages(message,split_string(output,1700))
@@ -78,7 +65,7 @@ async def on_message(message):
     if message.guild is None:
         async with message.channel.typing():
             print(f"New DM from {message.author.name}! :" + message_str)
-            output = WaitForAPI(message_str)
+            output = WaitForAPI(message_str,message.author.name)
             if output != None:
                 #split if message is too long
                 await send_messages(message,split_string(output,1700))
@@ -87,73 +74,86 @@ async def on_message(message):
                 await message.author.send("Failed To Answer")
                 await message.add_reaction('❌')
 
-def WaitForAPI(message):
+def WaitForAPI(message, userID):
     if USE_CHAT:
-        return WaitForAPIChat(message)
+        return WaitForAPIChat(message,userID)
     else:
-        return WaitForAPIGenerate(message)
+        return WaitForAPIGenerate(message,userID)
 
 
 #Example using Chat mode Trainable
-def WaitForAPIChat(message):
+def WaitForAPIChat(message,user_id):
     global message_history_chat
     global history_count
+    
+    #Holder for Errors
     extra_text = ""
-    message_history_chat.append(message)
+
+    #check for Key
+    if user_id not in message_history_chat:
+        message_history_chat[user_id] = []
+        print("New Chat Found adding " + str(user_id))
+    #add the message
+    message_history_chat[user_id].append(message)
 
     #Talk to API
     response = palm.chat(
     **DEFAULT_CHAT,
     context=BOT_CONTEXT,
-    examples=EXAMPLE_MESSAGES,
-    messages=message_history_chat
+    messages=message_history_chat[user_id]
     )
     #Check For Errors
     if not response.last:
             print(message + "Failed to Send")
             return None
-    #Deal with Memory
-    if HAS_MEMORY:
-        history_count = history_count + 1
-        if history_count > MESSAGE_MAX_HISTORY:
-            print("----Memory Full Forgetting")
-            extra_text = " ***Memory is Full Forgetting***"
-            message_history_chat = []
-        message_history_chat.append(" " + response.last)
-    else:
-        #Return Message history to default
-        message_history_chat = []
+    
+    #If more messages then chat history remove the top one 
+    if len(message_history_chat[user_id]) >= MESSAGE_MAX_HISTORY:
+        message_history_chat[user_id].pop(0)
+
+    #if memory disabled ignore
+    if HAS_MEMORY == False:
+        del message_history_chat[user_id]
+    #print(message_history_chat[user_id])
+    message_history_chat[user_id].append(response.last)
     return response.last + extra_text
 
 #Example just using text completion mode
-def WaitForAPIGenerate(message):
-    
-    global message_history_gen
+def WaitForAPIGenerate(message,user_id):
+    global message_history_chat
     global history_count
     extra_text = ""
-    #if Memory All this stuff
-    message_history_gen += message;
 
-        #Talk to palm AI simple Text generate
+    #
+    if user_id not in message_history_chat:
+        message_history_chat[user_id] = []
+        print("New Chat Found adding " + str(user_id))
+    message_history_chat[user_id].append(message)
+
+    #Talk to API generate
     response = palm.generate_text(
     **DEFAULT_GENERATE_TEXT,
-    prompt=message_history_gen
+    prompt=' '.join(message_history_chat[user_id])
     )
+
+    #if Result errors 
     if not response.result:
             print(message + "Failed to Send")
             return None
-    if HAS_MEMORY:
-        history_count = history_count + 1
-        if history_count > MESSAGE_MAX_HISTORY:
-            print("----Memory Full Forgetting")
-            extra_text = " ***Memory is Full Forgetting***"
-            message_history_gen = ""
-        message_history_gen = message +  " " + response.result;
-    else:
-        message_history_gen = ""
+
+    #If more messages then chat history remove the top one 
+    if len(message_history_chat[user_id]) >= MESSAGE_MAX_HISTORY:
+        message_history_chat[user_id].pop(0)
+
+    #if memory disabled ignore
+    if HAS_MEMORY == False:
+        del message_history_chat[user_id]
+    #A Debug tester
+    #print(message_history_chat[user_id])
+    message_history_chat[user_id].append(response.result)
     return response.result + extra_text
 
-
+#string splitter if it gets too long
 def split_string(string, max_length):
     messages = []
     for i in range(0, len(string), max_length):
@@ -165,20 +165,14 @@ async def send_messages(messageSystem,output):
     for index, string in enumerate(output):
         await messageSystem.channel.send(string)
 
-
-#def chatActivationPhrase(message):
-#    if message.startswith(IN_CHANNEL_CHAT_PHRASE):
-#        return True
-
-async def ExtraCommands(message):
-    global message_history
-    global history_count
+async def ExtraCommands(message,user_id):
+    global message_history_chat
     if message.startswith("COM"):
         command_message = message.replace("COM ",'')
         match command_message:
             case "Reset":
-                message_history = "";
-                history_count = 0
+                if user_id in message_history_chat:
+                    del message_history_chat[user_id]
                 return "***Deleteing History Reset to Default***"
             #Add extra  cases for later!
             #case 2: 
